@@ -1,0 +1,91 @@
+package uniLink;
+
+import java.util.Collections;
+
+public class Job extends Post {
+	
+	// static variable
+	private static int count = 1;
+	
+	// instance variable
+	private double proposedPrice;
+	private double lowestOffer;
+	
+	public Job (String title, String desc, String creatorID, double proposedPrice) {
+		super ("JOB" + String.format("%03d", Job.count), title, desc, creatorID);
+		Job.count++;
+		this.proposedPrice = proposedPrice;
+		this.lowestOffer = proposedPrice+1; // proposedPrice+1 indicated that there is no offer yet, and not initiated with 0 because to diminish ambiguous if there is loewstOffer = 0;
+	}
+
+	public double getProposedPrice() {
+		return proposedPrice;
+	}
+
+	public void setProposedPrice(double proposedPrice) {
+		this.proposedPrice = proposedPrice;
+	}
+
+	public double getLowestOffer() {
+		return lowestOffer;
+	}
+
+	public void setLowestOffer(double lowestOffer) {
+		this.lowestOffer = lowestOffer;
+	}
+	
+	public String getLowestOfferStr() {
+		if (lowestOffer > proposedPrice) {
+			return "NO OFFER";
+		}
+		return "$" + Double.toString(lowestOffer);
+	}
+	
+	// methods
+	@Override
+	public String getPostDetails() {
+		String strJob = super.getPostDetails() + "\nProposed price: $" + getProposedPrice()
+						+ "\nLowest offer: \t" + getLowestOfferStr();
+		return strJob;
+	}
+	
+	// methods student about to reply
+	@Override
+	public String getDetailsOnReply() {
+		String strJob = "\nName: \t\t" + super.getTitle() + "\nProposed Price: $" + getProposedPrice() 
+		+ "\nLowest Offer: \t" + getLowestOfferStr();
+		return strJob;
+	}
+	
+	@Override
+	public boolean handleReply(Reply reply) {
+		// the new offer price is less than the current lowest offer, the student id is not yet recorded
+		if ((reply.getValue() < lowestOffer) &&
+			(!super.isStudentIdAlreadyinTheList(reply.getResponderID()))) {
+				super.getListOfReplies().add(reply);
+				// set the lowest offer to be new offer price
+				lowestOffer = reply.getValue();
+				return true;
+			}
+		else
+			return false;
+	}
+	
+	@Override
+	public String getReplyDetails() {
+		String details = "\n" + getPostDetails() + "\n";
+		details += "\n-- Offer History --\n";
+		
+		if (super.getListOfReplies().size() > 0) {
+			Collections.sort(super.getListOfReplies(), Collections.reverseOrder()); // sorting ascending
+			for (int i = 0; i < super.getListOfReplies().size(); i++) {
+				details += super.getListOfReplies().get(i).getResponderID() + ": \t$" + 
+						super.getListOfReplies().get(i).getValue() + "\n";
+			}
+		}
+		else {
+			details += "Empty";
+			}
+		return details;
+	}
+}
