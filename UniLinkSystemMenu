@@ -1,0 +1,464 @@
+package uniLink;
+
+import java.util.regex.Pattern;
+import java.util.*;
+
+
+public class UniSystemMenu {
+	
+	private ArrayList<Post> post_list;
+	private String currentUserID;
+	Scanner console = new Scanner(System.in);
+	
+	public UniSystemMenu() {
+		post_list = new ArrayList<Post>();
+	}
+
+	public static void main(String[] args) {
+	
+		UniSystemMenu uniLinkSystem = new UniSystemMenu();
+		uniLinkSystem.runSystem();	
+	}		
+		
+	public void runSystem() {
+		boolean quit = false;
+		
+		while(!quit) {
+			System.out.println("\n** UniLink System **");
+			System.out.println("1.	Log in");
+			System.out.println("2.	Log Out");
+			System.out.print("Enter your choice: ");
+			String op = console.nextLine();
+			
+			if (op.equals("1")) {
+				boolean isValidStudentID = false;
+				if (!isValidStudentID) {
+					System.out.print("Enter Username: ");
+					currentUserID = console.nextLine().toLowerCase();
+					// user id must with s, then number between 1 and 9
+					if (Pattern.matches("^s[0-9]+", currentUserID)) {
+						isValidStudentID = true;
+					}
+					else {
+						System.out.println("Warning: Student ID is not valid.\n");
+					}
+				}
+				// display student menu if valid student ID was entered.
+				if (isValidStudentID) {
+					displayStudentMenu();
+				}
+			}
+			else if (op.equals("2")) {
+				System.out.println("System Existed! Thanks for using UniLink System.");
+				quit = true;
+			}
+			else {
+				System.out.println("Warning: Wrong choice!");
+				continue;
+			}
+		}
+	}
+	
+	public void displayStudentMenu() {
+		boolean logout = false;
+		
+		while(!logout) {
+			System.out.println("\nWelcome " + currentUserID + "!");
+			System.out.println("** Student Menu **");
+			System.out.println("1. New Event Post");
+			System.out.println("2. New Sale Post");
+			System.out.println("3. New Job Post");
+			System.out.println("4. Replay To Post");
+			System.out.println("5. Display My Posts");
+			System.out.println("6. Display All Posts");
+			System.out.println("7. Close Posts");
+			System.out.println("8. Delete Posts");
+			System.out.println("9. Log Out");
+			System.out.print("Enter your choice : ");
+			String op = console.nextLine();
+			
+			switch (op) {
+				case "1": 	newEventPost();	break;
+				case "2": 	newSalePost(); break;	
+				case "3": 	newJobPost(); break;			
+				case "4": 	replyToPost(); break;				
+				case "5": 	displayMyPost(); break;			
+				case "6": 	displayAllPost(); break;	
+				case "7": 	closePost(); break;
+				case "8": 	deletePost(); break;
+				case "9": 	logout = true; 
+							System.out.println("You have successfully logged out.");break;
+				default	:	System.out.println("Warning: Wrong choice. Please enter in range [1..9]."); break;
+			}
+		}
+	}
+	
+	public void newEventPost() {
+		System.out.println("\nEnter details of the event below:");
+		System.out.print("Name: ");
+		String name = console.nextLine();
+		System.out.print("Description: ");
+		String desc = console.nextLine();
+		System.out.print("Venue: ");
+		String venue = console.nextLine();
+		System.out.print("Date: ");
+		String date = console.nextLine();
+		
+		boolean isInteger = false;
+		int capacity = 0;
+		
+		while(!isInteger) {
+			System.out.print("Capacity: ");
+			String capacity_str = console.nextLine();
+			try {
+				capacity = Integer.parseInt(capacity_str);
+				isInteger = true;
+			}
+			catch(NumberFormatException e) {
+				System.out.print("Warning: Input an integer value.\n");
+			}
+		}
+		try {
+			Event newEvent = new Event(name, desc, currentUserID, venue, date, capacity); // edit attendeeCOunt
+			post_list.add(newEvent);
+			System.out.println("Success! Your event has been created with id " + newEvent.getId());
+		}
+		catch(Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	public void newSalePost() {
+		System.out.println("\nEnter details of the item to sale below: ");
+		System.out.print("Name: ");
+		String name = console.nextLine();
+		System.out.print("Description: ");
+		String desc = console.nextLine();
+		
+		boolean isDouble = false;
+		double askingPrice = 0;
+		
+		while (!isDouble) {
+			System.out.print("Asking price: ");
+			String askingPrice_str = console.nextLine();
+			try {
+				askingPrice = Double.parseDouble(askingPrice_str);
+				isDouble = true;
+			}
+			catch (NumberFormatException e) {
+				System.out.print ("Error: Please input a number.\n");
+			}
+		}
+		
+		isDouble = false;
+		double minRaise = 0;
+		
+		while (!isDouble) {
+			System.out.print("Minimum raise: ");
+			String minRaise_str = console.nextLine();
+			try {
+				minRaise = Double.parseDouble(minRaise_str);
+				isDouble = true;
+			}
+			catch(NumberFormatException e) {
+				System.out.println("Error: Please input a number.\n");
+			}
+		}
+		try {
+			Sale newSale = new Sale(name, desc, currentUserID, askingPrice, minRaise);
+			post_list.add(newSale);
+			System.out.println("Success! your new sale has been created with id " + newSale.getId());
+		}
+		catch(Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	public void newJobPost() {
+		System.out.println("\nEnter details of the job below: ");
+		System.out.print("Name: ");
+		String name = console.nextLine();
+		System.out.print("Description: ");
+		String desc = console.nextLine();
+		
+		boolean isDouble = false;
+		double proposedPrice = 0;
+		
+		while (!isDouble) {
+			System.out.print("Propose price: ");
+			String proposedPrice_str = console.nextLine();
+			try {
+				proposedPrice = Double.parseDouble(proposedPrice_str);
+				isDouble = true;
+			}
+			catch(NumberFormatException e) {
+				System.out.println("Error: please input a number.");
+			}
+		}
+		
+		try {
+			Job newJob = new Job(name, desc, currentUserID, proposedPrice);
+			post_list.add(newJob);
+			System.out.println("Success! Your job has been created with id " + newJob.getId());
+		}
+		catch(Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	// function to display all posts created by currently logged-in student
+	public void displayMyPost() {
+		System.out.print("\n\t** My Post **\n");
+		boolean isMyPostExist = false;
+		for (Post p : post_list) {
+			if (p.getCreatorID().equals(this.currentUserID)) {
+				isMyPostExist = true;
+				System.out.print(p.getReplyDetails());
+				System.out.println("\n-----------------------------");
+			}
+		}
+		if (!isMyPostExist) {
+			System.out.print("\nYou do not have any post yet.");
+		}
+		System.out.println();
+	}
+	
+	// assumption that a student cannot reply to her or his own post
+	public void replyToPost() {
+		String post_id = "";
+		boolean isValidPostID = false;
+		
+		while(!isValidPostID) {
+			System.out.print("Enter post id or 'Q' to quit: ");
+			post_id = console.nextLine().trim();
+			if(post_id.equals("Q")) {
+				break;
+			}
+			else if(!isValidPostIDFormat(post_id)) {
+				System.out.print("Error: Invalid post id. post is not found.\n");
+			}
+			else {
+				isValidPostID = true;
+			}
+		}
+		
+		// only proceed to search the post list if the post id is in a valid format
+		if(isValidPostID) {
+			Post the_post = null;
+			for(Post p : post_list) {
+				if(p.getId().equals(post_id)) {
+					the_post = p;
+				}
+			}
+			if(the_post == null) {
+				System.out.println("Error: Invalid post id. post is not found.\n");
+			}
+			else if(the_post.getCreatorID().equals(currentUserID)) { 
+				System.out.println("Error: Replying to own your post is invalid.");
+			}
+			else if(the_post.getStatus().equals("CLOSED")) {
+				System.out.println("Error: This post already closed. Reply is not accepted.");
+			}
+			else if(the_post.getId().startsWith("EVE")) {
+				System.out.println(the_post.getDetailsOnReply());
+				
+				boolean isValidResponse = false;
+				while(!isValidResponse) {
+					System.out.print("Enter '1' to join the event or 'Q' to quit: ");
+					String response = console.nextLine().toLowerCase();
+					
+					if(response.equals("1")) {
+						isValidResponse = true;
+						Reply reply = new Reply(post_id, 1, currentUserID);
+						
+						boolean reply_status = the_post.handleReply(reply);
+						if(reply_status) {
+							System.out.println("Success! Your event registration has been accepted.");
+						}
+						else {
+						System.out.println("Error: You are already replied to this event.");
+						}
+					}
+					else if(response.equals("q")) {
+						isValidResponse = true;
+					}
+				}
+			}
+			// assume that the student can only offer once in the same postID. 
+			else if(the_post.getId().startsWith("SAL")) {
+				System.out.println(the_post.getDetailsOnReply());
+				
+				boolean isValidResponse = false;
+				while(!isValidResponse) {
+					System.out.print("Enter your offer or 'Q' to quit: ");
+					String response = console.nextLine();
+					double offer = 0;
+					
+					if(response.equals("Q")) {
+						isValidResponse = true;
+					}
+					else {
+						try {
+							offer = Double.parseDouble(response);
+						}
+						catch(NumberFormatException e) {
+							System.out.println("Error: Please give valid input (a number or 'Q').");
+						}
+						Reply reply = new Reply(post_id, offer, currentUserID);
+						
+						boolean reply_status = the_post.handleReply(reply);
+						if(reply_status) {
+							System.out.print("Success! Your offer has been accepted.");
+							isValidResponse = true;
+							if(offer >= ((Sale)the_post).getAskingPrice()) {
+								System.out.print("\nCongratulation! " + the_post.getTitle() + " has been sold to you.");
+								System.out.println("\nPlease contact the owner " + the_post.getCreatorID() + " for more details.");
+								the_post.setStatus("CLOSED");
+							}
+						}
+						else {
+							System.out.println("Error: Your offer must be higher than current offer, at least by a minimum raise or you already offered this sale.");
+							isValidResponse = false;
+						}
+					}
+				}
+			}
+			// assume that the student can only offer once in the same post ID.
+			else if(the_post.getId().startsWith("JOB")) {
+				System.out.println(the_post.getDetailsOnReply());
+				
+				boolean isValidResponse = false;
+				while(!isValidResponse) {
+					System.out.print("Enter your offer or 'Q' to quit: ");
+					String response = console.nextLine();
+					double offer = 0;
+					
+					if(response.equals("Q")) {
+						isValidResponse = true;
+					}
+					else {
+						try {
+							offer = Double.parseDouble(response);
+						}
+						catch(NumberFormatException e) {
+							System.out.println("Error: Please give valid input (a number or 'Q').\n");
+						}
+						Reply reply = new Reply(post_id, offer, currentUserID);
+						
+						boolean reply_status = the_post.handleReply(reply);
+						if(reply_status) {
+							System.out.println("Success! your offer has been accepted.");
+							isValidResponse = true;
+						}
+						else {
+							System.out.println("Error: your offer must be lower than current offer, at least equal to porposed price or You are already offered this job.");
+							isValidResponse = false;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	// function to display all posts in the system
+	public void displayAllPost() {
+		System.out.println("\n\t** All Posts **");
+		for (Post p : post_list) {
+			System.out.print(p.getPostDetails());
+			System.out.println("\n-----------------------------");
+		}
+		System.out.println();
+	}
+	
+	// close post method: only can closed by post creator
+	public void closePost() {
+		String post_id = "";
+		boolean isValidPostID = false;
+		
+		while(!isValidPostID) {
+			System.out.print("Enter post ID to close or 'Q' to quit: ");
+			post_id = console.nextLine().trim();
+			
+			if(post_id.equals("Q")) {
+				break;
+			}
+			else if(!isValidPostIDFormat(post_id)) {
+				System.out.print("Error: Invalid post ID format. Post is not found.\n");
+			}
+			else {
+				isValidPostID = true;
+			}
+		}
+		if(isValidPostID) {
+			Post the_post = null;
+			for(Post p : post_list) {
+				if(p.getId().equals(post_id)) {
+					the_post = p;
+					break;
+				}
+			}
+			if(the_post == null) {
+				System.out.print("Error: Invalid post ID. Post is not found.\n");
+			}
+			else if(!the_post.getCreatorID().equals(currentUserID)) {
+				System.out.print("Error: Request denied. You are not the owner of this post.\n");
+			}
+			else if(the_post.getStatus().equals("CLOSED")) {
+				System.out.print("Error: This post is already closed.\n");
+			}
+			else {
+				the_post.setStatus("CLOSED");
+				System.out.print("Success. Post is closed.\n");
+			}
+		}
+	}
+	
+	// deletePost Method: only delete by postID creator
+	public void deletePost() {
+		String post_id = null;
+		boolean isValidPostID = false;
+		
+		while(!isValidPostID) {
+			System.out.print("Enter post ID to delete or 'Q' to quit: ");
+			post_id = console.nextLine().trim();
+			
+			if(post_id.equals("Q")) {
+				break;
+			}
+			else if(!isValidPostIDFormat(post_id)) {
+				System.out.print("Error: Invalid post ID format. Post is not found.\n");
+			}
+			else {
+				isValidPostID = true;
+			}
+		}
+		if(isValidPostID) {
+			Post the_post = null;
+			for(Post p : post_list) {
+				if(p.getId().equals(post_id)) {
+					the_post = p;
+				}
+			}
+			if(the_post == null) {
+				System.out.print("Error: Invalid post ID. Post is not found.\n");
+			}
+			else if(!the_post.getCreatorID().equals(currentUserID)) {
+				System.out.print("Error: Request denied. You are not the owner of this post.\n");
+			}
+			else {
+				post_list.remove(the_post);
+				System.out.print("Success. Post deleted.\n");
+			}
+		}
+	}
+	
+	// helper function to check if a given post ID is in a valid format
+	public boolean isValidPostIDFormat(String post_id) {
+		if(post_id.length() == 6) {
+			if(post_id.startsWith("EVE") || post_id.startsWith("SAL") || post_id.startsWith("JOB")) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
