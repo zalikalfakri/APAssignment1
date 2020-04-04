@@ -1,0 +1,105 @@
+package uniLink;
+
+import java.util.*;
+
+public class Sale extends Post {
+	
+	// static variable
+	private static int count = 1;
+	
+	// instance variable
+	private double askingPrice;
+	private double highestOffer;
+	private double minRaise;
+	
+	public Sale (String title, String desc, String creatorID, double askingPrice, double minRaise) {
+	super ("SAL" + String.format("%03d", Sale.count), title, desc, creatorID);
+	Sale.count++;
+	this.askingPrice = askingPrice;
+	this.highestOffer = 0;
+	this.minRaise = minRaise;
+	}
+
+	public double getAskingPrice() {
+		return askingPrice;
+	}
+
+	public void setAskingPrice(double askingPrice) {
+		this.askingPrice = askingPrice;
+	}
+
+	public double getHighestOffer() {
+		return highestOffer;
+	}
+
+	public void setHighestOffer(double highestOffer) {
+		this.highestOffer = highestOffer;
+	}
+	
+	public String getHighestOfferStr() {
+		if (highestOffer == 0.0) {
+			return "NO OFFER";
+		}
+		return "$" + Double.toString(highestOffer);
+	}
+
+	public double getMinRaise() {
+		return minRaise;
+	}
+
+	public void setMinRaise(double minRaise) {
+		this.minRaise = minRaise;
+	}
+	
+	// override abstract method of getPostDetails from superclass
+	@Override
+	public String getPostDetails() {
+		String strSale = super.getPostDetails() + "\nMinimun raise: \t$" + getMinRaise() 
+						 + "\nHighest offer: \t" + getHighestOfferStr();
+		return strSale;
+	}
+	
+	// override abstract method a student about to reply
+	@Override
+	public String getDetailsOnReply() {
+		String strSale = "\nName: \t\t" + super.getTitle() + "\nHighest offer: \t" + getHighestOfferStr() + "\nMinimum Raise: \t$" + getMinRaise();
+		return strSale;
+	}
+	
+	// override abstract method of handleReply from superclass
+	@Override
+	public boolean handleReply(Reply reply) {
+		// the new offer price is highest than current highest offer, the student id is not yet recorded
+		if ((reply.getValue() >= highestOffer) &&
+			(reply.getValue() - highestOffer >= minRaise) &&
+			(!super.isStudentIdAlreadyinTheList(reply.getResponderID()))) {
+				super.getListOfReplies().add(reply);
+				// set the highest value to be the new offer price
+				highestOffer = reply.getValue();
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	// override abstract method of getReplyDetails() from superclass
+	@Override
+	public String getReplyDetails() {
+		String details = "\n" + getPostDetails() + "\n";
+		details += "Asking price: \t$" + getAskingPrice() + " (NOTE: Only visible to the post creator)"+ "\n";
+		details += "\n-- Offer History --\n"; 
+		
+		if(super.getListOfReplies().size() > 0) {
+			Collections.sort(super.getListOfReplies());
+			for (int i = 0; i < super.getListOfReplies().size(); i++) {
+					details += super.getListOfReplies().get(i).getResponderID() + ": \t$" + 
+							super.getListOfReplies().get(i).getValue() + "\n";
+			}
+		}
+		else {
+			details += "Empty";
+		}
+		return details;
+	}
+	
+}
