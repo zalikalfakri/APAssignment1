@@ -1,0 +1,110 @@
+package uniLink;
+
+public class Event extends Post {
+	
+	// static variable
+	private static int count = 1;
+	
+	// instance variable
+	private String venue;
+	private String date;
+	private int capacity;
+	private int attendeeCount;
+	
+	public Event (String title, String desc, String creatorID, String venue, String date, int capacity) { //edit attendeeCount
+		super ("EVE" + String.format("%03d", Event.count), title, desc, creatorID);
+		Event.count++;
+		this.venue = venue;
+		this.attendeeCount = 0;
+		this.capacity = capacity;
+		this.date = date;
+	}
+
+	public String getVenue() {
+		return venue;
+	}
+
+	public void setVenue(String venue) {
+		this.venue = venue;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public int getCapacity() {
+		return capacity;
+	}
+
+	public void setCapacity(int capacity) {
+		this.capacity = capacity;
+	}
+
+	public int getAttendeeCount() {
+		return attendeeCount;
+	}
+
+	public void setAttendeeCount(int attendeeCount) {
+		this.attendeeCount = attendeeCount;
+	}
+	
+	// override the abstract method of getPostDetails
+	@Override
+	public String getPostDetails() {
+		String strEvent = super.getPostDetails() + "\nVenue: \t\t" + getVenue() + "\nDate: \t\t" + getDate() 
+		+ "\nCapacity: \t" + getCapacity() + "\nAttendess: \t" + getAttendeeCount();
+		return strEvent;
+	}
+	
+	// return event's short details when a student about to reply
+	@Override
+	public String getDetailsOnReply() {
+		String strEvent = "\nName: \t" + super.getTitle() + "\nVenue: \t" + getVenue() + "\nStatus: " + super.getStatus();
+		return strEvent;
+	}
+	
+	// override the abstract method of handleReply
+	@Override
+	public boolean handleReply(Reply reply) {
+		// event is not full, the student id is not yet recorded
+		if ((reply.getValue() == 1) && 
+			(getCapacity() > getAttendeeCount()) &&
+			(!super.isStudentIdAlreadyinTheList(reply.getResponderID()))) {
+				super.getListOfReplies().add(reply);
+				// adding attendees
+				attendeeCount += 1;  
+				// when the event is full, event status is set to CLOSED
+				if (capacity == getAttendeeCount() && super.getStatus().equals("OPEN")) {
+						super.setStatus("CLOSED");
+					}
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	// override the abstract method of replyDetails
+	@Override
+	public String getReplyDetails() {
+		String details = getPostDetails() + "\n";
+		details += "Attendee List:\t";
+		int attendee_count = super.getListOfReplies().size();
+		
+		if (attendee_count == 0) {
+			details += "Empty";
+		}
+		else {
+			for (int i = 0; i < attendee_count; i++) {
+				details += super.getListOfReplies().get(i).getResponderID();
+				if (i < attendee_count - 1) {
+					details += ",";
+				}
+			}
+		}
+		return details;
+	}
+}
