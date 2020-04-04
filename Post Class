@@ -1,0 +1,97 @@
+package uniLink;
+
+import java.util.ArrayList;
+import java.util.List;
+
+// abstract class
+public abstract class Post {
+	
+	private String id;
+	private String title;
+	private String desc;
+	private String creatorID;
+	private String status;
+	private List<Reply> listOfReplies; 
+	
+	// constructor
+	public Post (String id, String title, String desc, String creatorID) {
+		this.id = id;
+		this.title = title;
+		this.desc = desc;
+		this.creatorID = creatorID;
+		this.status = "OPEN";
+		this.listOfReplies = new ArrayList<Reply>();
+	}
+
+	// methods
+	public String getPostDetails() {
+		String str = "ID: \t\t" + this.getId() + "\nTitle: \t\t" + this.getTitle() 
+					+ "\nDescription: \t" + this.getDesc() + "\nCreator ID: \t"
+					+ this.getCreatorID() + "\nStatus: \t" + this.getStatus();
+		return str;
+	}
+	
+	// methods for student to about reply
+	public abstract String getDetailsOnReply();
+	
+	// abstract methods handleReply
+	public abstract boolean handleReply(Reply reply); 
+		
+	// abstract methods ReplyDetails
+	public abstract String getReplyDetails();
+	
+	// check if the responderID already reply
+	public boolean isStudentIdAlreadyinTheList(String studentID) {
+		for (int i = 0; i < this.listOfReplies.size(); i++) {
+			if (studentID.equals(this.listOfReplies.get(i).getResponderID())) {
+				return true;
+			}
+		}
+		return false;
+	}
+		
+	// getter and setter
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public String getDesc() {
+		return desc;
+	}
+
+	public void setDesc(String desc) {
+		this.desc = desc;
+	}
+
+	public String getCreatorID() {
+		return creatorID;
+	}
+
+	public void setCreatorID(String creatorID) {
+		this.creatorID = creatorID;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public List<Reply> getListOfReplies() {
+		return listOfReplies;
+	}	
+}
