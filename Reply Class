@@ -1,0 +1,49 @@
+package uniLink;
+
+public class Reply implements Comparable<Reply> {
+	
+	private String postID;
+	private double value;
+	private String responderID;
+	
+	public Reply (String postID, double value, String responderID) {
+		this.postID = postID;
+		this.value = value;
+		this.responderID = responderID;		
+	}
+
+	public String getPostID() {
+		return postID;
+	}
+
+	public void setPostID(String postID) {
+		this.postID = postID;
+	}
+
+	public double getValue() {
+		return value;
+	}
+
+	public void setValue(int value) {
+		this.value = value;
+	}
+
+	public String getResponderID() {
+		return responderID;
+	}
+
+	public void setResponderID(String responderID) {
+		this.responderID = responderID;
+	}
+	
+	@Override
+	public int compareTo (Reply otherReply) {
+		if (this.value > otherReply.getValue())
+			return -1;
+		else
+			if (this.value < otherReply.getValue())
+				return 1;
+			else
+				return 0;
+	}
+}
